@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: openresty/openresty
+  tag: "alpine-fat-arm64v8"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  HEADER_SECRET_VALUE: ""
+
+ingress:
+  enabled: false
+
+resources: {}

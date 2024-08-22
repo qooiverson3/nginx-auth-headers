@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ngx-lua.fullname" . }}
+  labels:
+    {{- include "ngx-lua.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "ngx-lua.name" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "ngx-lua.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: openresty
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: 80
+        env:
+        - name: HEADER_SECRET_VALUE
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "ngx-lua.fullname" . }}-secret
+              key: header-value
+        volumeMounts:
+        - name: ngx-config
+          mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: ngx-config
+        configMap:
+          name: {{ include "ngx-lua.fullname" . }}-config
